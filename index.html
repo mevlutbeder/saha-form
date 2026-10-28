@@ -377,12 +377,30 @@ function setSound(mode){
   if(cur && started) renderPanel();
 }
 $("sndBtn").addEventListener("click", ()=>setSound(soundMode==="all"?"warn":soundMode==="warn"?"off":"all"));
+/* ---------- Okuyan ses seçimi: telefondaki en doğal Türkçe sesi bulur ---------- */
+let VOICES = [], voicePick = null;
+try{ voicePick = localStorage.getItem("pk-voice"); }catch(e){}
+function loadVoices(){ try{ VOICES = speechSynthesis.getVoices().filter(v=>/^tr/i.test(v.lang)); }catch(e){ VOICES=[]; } voiceRow(); }
+if("speechSynthesis" in window){ loadVoices(); try{ speechSynthesis.onvoiceschanged = loadVoices; }catch(e){} }
+function voiceScore(v){ const n=v.name.toLowerCase(); let sc=0;
+  if(/natural|neural|online|enhanced|premium|wavenet|studio/.test(n)) sc+=5;
+  if(/google/.test(n)) sc+=2; if(/microsoft/.test(n)) sc+=1; if(!v.localService) sc+=1; return sc; }
+function bestVoice(){ if(!VOICES.length) return null; if(voicePick){ const v=VOICES.find(x=>x.name===voicePick); if(v) return v; }
+  return VOICES.slice().sort((a,b)=>voiceScore(b)-voiceScore(a))[0]; }
+function voiceRow(){ const el=$("voiceRow"); if(!el) return;
+  if(!VOICES.length){ el.textContent = "Okuyan ses: telefonun varsayılan sesi"; return; }
+  const bv = bestVoice();
+  el.innerHTML = 'Okuyan ses: <select id="voiceSel" style="max-width:62%;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--paper)">'+
+    VOICES.map(v=>'<option'+(bv&&v.name===bv.name?' selected':'')+'>'+esc(v.name)+'</option>').join("")+'</select> <button type="button" class="sm" id="vTest" style="height:30px;padding:0 10px;border-radius:15px;border:1px solid var(--line);background:transparent">Dinle</button>';
+  $("voiceSel").addEventListener("change", e=>{ voicePick=e.target.value; try{ localStorage.setItem("pk-voice", voicePick); }catch(_){} });
+  $("vTest").addEventListener("click", ()=>{ const m=soundMode; soundMode="all"; speak("Emniyet ventili kaç barda açtı?", false, null); soundMode=m; });
+}
 function speak(text, isWarn, cb){
   const ok = soundMode==="all" || (soundMode==="warn" && isWarn);
   if(!ok || !("speechSynthesis" in window)){ if(cb) cb(); return; }
   try{
     speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text); u.lang = "tr-TR"; u.rate = 1.05;
+    const u = new SpeechSynthesisUtterance(text); u.lang = "tr-TR"; u.rate = 1.0; const bv = bestVoice(); if(bv) u.voice = bv;
     let called = false; const fin = ()=>{ if(!called){ called=true; if(cb) cb(); } };
     u.onend = fin; u.onerror = fin; setTimeout(fin, Math.min(7000, 1500 + text.length*80));
     speechSynthesis.speak(u);
@@ -418,6 +436,7 @@ function phraseList(f){
     if(f.unit) w.push(f.unit); w.push("on bar","on bir buçuk","on bir bar","dokuz buçuk"); }
   else if(f.t==="choice") w = f.opts.concat(["atla","önceki"]);
   else w = ["atla","önceki"];
+  if(f.t==="yn"){ w = w.concat(Object.keys(S.learn[f.id]||{}), ["temiz","sağlam","çalışıyor","mevcut","işaretli","kirli","bozuk","sızdırıyor"]); }
   return w.map(x=>{ try{ return new SpeechRecognitionPhrase(x, 3.0); }catch(e){ return null; } }).filter(Boolean);
 }
 if(!SR){ micOK=false; micMsg="Bu tarayıcı ses tanımayı desteklemiyor. Telefonda Chrome ile aç."; }
@@ -513,19 +532,38 @@ function parseCmd(s){
   if(/tekrar|bir daha/.test(s)) return "repeat";
   return null;
 }
+/* ---------- Kelime öğrenme: söylenen ama anlaşılmayan kelimeyi, sonra dokunulan cevapla eşleştirir ---------- */
+let lastHeard = null;
+S.learn = S.learn || {}; S.learnG = S.learnG || {};
+function norm(t){ return String(t).toLocaleLowerCase("tr").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim(); }
+function findLearned(map, n){ if(!map) return null; const keys = Object.keys(map).sort((x,y)=>y.length-x.length);
+  for(const k of keys){ if(n===k || (" "+n+" ").includes(" "+k+" ")) return map[k]; } return null; }
+function learnedYN(qid, t){ const n=norm(t); const a=findLearned(S.learn[qid], n); if(a) return a; return findLearned(S.learnG, n); }
+function naturalYN(t){ const n=" "+norm(t)+" ";
+  if(/ kirli | bozuk | kırık | çatlak | arızalı | çalışmıyor | sızdırıyor | sızıntı var | paslı | eksik | hasarlı | okunmuyor | görünmüyor /.test(n)) return "UD";
+  if(/ temiz | sağlam | çalışıyor | mevcut | işaretli | düzgün | normal | sorunsuz | iyi | geçerli | yerinde /.test(n)) return "U";
+  return null; }
+function learnFrom(val){
+  if(!lastHeard || lastHeard.q!==cur || byId[cur].t!=="yn" || lastHeard.parsed===val) return "";
+  const n = norm(lastHeard.text); if(!n || n.length>40) return "";
+  (S.learn[cur] = S.learn[cur] || {})[n] = val; S.learnG[n] = val; save();
+  return 'Öğrendim: "'+lastHeard.text+'" artık '+YN.find(y=>y[0]===val)[1]+' sayılacak.';
+}
 function handleSpeech(alts){
   const f = byId[cur]; if(!f) return;
+  lastHeard = {q:cur, text:alts[0], parsed:null};
   for(const a of alts){
     const c = parseCmd(a);
     if(c==="prev"){ goPrev(); return; }
     if(c==="skip"){ goNext(); return; }
     if(c==="repeat"){ renderPanel(); speakQ(); return; }
     let val = null;
-    if(f.t==="yn") val = parseYN(a);
+    if(f.t==="yn") val = learnedYN(cur, a) || naturalYN(a) || parseYN(a);
     else if(f.t==="num") val = parseNum(a);
     else if(f.t==="choice") val = f.opts.find(o=>a.toLocaleLowerCase("tr").includes(o.toLocaleLowerCase("tr"))) || null;
     else if(f.t==="text") val = a.trim();
     if(val!==null && val!==""){
+      lastHeard = {q:cur, text:a, parsed:val};
       showHeard(a, val);
       if(f.t==="num"){ const i=$("inp"); if(i) i.value = trn(val); }
       if(f.t==="yn"||f.t==="choice"){ document.querySelectorAll(".ans").forEach(b=>b.classList.toggle("sel", b.dataset.v===val)); }
@@ -536,8 +574,7 @@ function handleSpeech(alts){
       return;
     }
   }
-  const h=$("heard"); if(h){ h.style.color="var(--bad)"; h.textContent='Anlaşılmadı: "'+alts[0]+'". Tekrar söyle ya da dokun.'; }
-  const sy=$("say"); if(sy && !micOK){ sy.value=""; }
+  const h=$("heard"); if(h){ h.style.color="var(--bad)"; h.textContent= f.t==="yn" ? 'Anlaşılmadı: "'+alts[0]+'". Doğru cevaba dokun, bu kelimeyi bir dahaki sefere tanırım.' : 'Anlaşılmadı: "'+alts[0]+'". Tekrar söyle ya da yaz.'; }
   setTimeout(listen, 800);
 }
 function showHeard(a, val){ const h=$("heard"); if(!h) return; h.style.color=""; const f=byId[cur];
@@ -568,24 +605,20 @@ function renderPanel(){
   h += '<button type="button" class="mic" id="micBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Konuşmak için dokun</span></button><div class="small" id="micMsg"></div><div class="small" id="engine" style="margin-top:4px"></div>';
   if(!micOK) h = h.replace(/<button type="button" class="mic"[\s\S]*?<\/button><div class="small" id="micMsg"><\/div>/, "");
   h += '<div class="nav"><button type="button" class="sm" id="prev">Önceki</button><button type="button" class="sm" id="skip">'+(f.optional?"Geç":"Atla")+'</button></div>';
-  if(micOK){
-    h += '<div class="test"><input id="say" placeholder="Söylediğini yazarak dene: on bir buçuk" aria-label="Konuşmayı yazarak dene"><button type="button" id="sayBtn">Dene</button></div>';
-  } else {
-    h += '<div class="kb"><label for="say">Sesli cevap</label><div class="row"><input id="say" class="inp txt" autocomplete="off" placeholder="Klavyedeki mikrofona bas ve konuş"><button type="button" class="btn" id="sayBtn">Gönder</button></div><div class="small">Kutuya dokun, klavyedeki mikrofon simgesine bas ve cevabı söyle: "evet", "uygun değil", "on bir buçuk" gibi. Yazı gelince kendiliğinden işlenir.</div></div>';
-  }
+  h += '<div class="small" id="voiceRow" style="margin-top:10px"></div>';
   $("panel").innerHTML = h;
   setLis(micOK ? "off" : "na");
   engineNote();
   if($("micBtn")) $("micBtn").addEventListener("click", ()=>{ try{ speechSynthesis.cancel(); }catch(e){} if(listening){ stopListen(); } else { listen(true); } });
-  document.querySelectorAll(".ans").forEach(b=>b.addEventListener("click", ()=>{ clearTimeout(pendingTimer); commit(cur, b.dataset.v); }));
+  document.querySelectorAll(".ans").forEach(b=>b.addEventListener("click", ()=>{
+    clearTimeout(pendingTimer); const v=b.dataset.v; const msg = learnFrom(v);
+    if(msg){ stopListen(); document.querySelectorAll(".ans").forEach(x=>x.classList.toggle("sel", x===b)); const h=$("heard"); if(h){ h.style.color="var(--ok)"; h.textContent=msg; } setTimeout(()=>commit(cur, v), 1300); }
+    else commit(cur, v); }));
   if($("ok")) $("ok").addEventListener("click", submitInput);
   if($("inp")){ $("inp").addEventListener("keydown", e=>{ if(e.key==="Enter") submitInput(); }); $("inp").addEventListener("input", ()=>{ $("err").textContent=""; liveWarn(); }); liveWarn(); }
   $("prev").addEventListener("click", goPrev);
   $("skip").addEventListener("click", goNext);
-  const sayGo = ()=>{ const t=$("say").value.trim(); if(t) handleSpeech([t]); };
-  $("sayBtn").addEventListener("click", sayGo);
-  $("say").addEventListener("keydown", e=>{ if(e.key==="Enter") sayGo(); });
-  if(!micOK){ let dt=null; $("say").addEventListener("input", ()=>{ clearTimeout(dt); dt=setTimeout(()=>{ const t=$("say").value.trim(); if(t){ handleSpeech([t]); } }, 1200); }); }
+  voiceRow();
 }
 function liveWarn(){ const w=$("wr"); if(!w) return; const x=parseNum($("inp").value||""); const m = x===null?"":checkWarn(cur,x); w.innerHTML = m ? '<div class="warn">'+esc(m)+'</div>' : ""; }
 function submitInput(){
@@ -613,6 +646,7 @@ function commit(id, val){
 }
 function ask(id){
   if(!started) return;
+  lastHeard = null;
   clearTimeout(pendingTimer);
   if(cur){ const p=$("r-"+cur); if(p) p.classList.remove("act"); }
   cur = id; setManual(false);
@@ -678,7 +712,7 @@ function begin(id){
   const first = id || ORDER.find(isEmpty);
   if(first) ask(first); else finish();
 }
-load(); initVals(); buildDoc(); paint(); layout();
+load(); S.learn = S.learn || {}; S.learnG = S.learnG || {}; initVals(); buildDoc(); paint(); layout();
 requestAnimationFrame(()=>{ applyScale(OUT, null, false); });
 startScreen();
 </script>
