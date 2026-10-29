@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Buhar Kazanı Saha Formu</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f5fa8">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
@@ -50,7 +53,6 @@ button{cursor:pointer}
 .vp{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .sizer{position:relative}
 .pg{position:absolute;left:0;top:0;transform-origin:0 0;background:var(--paper);box-shadow:0 1px 4px rgba(0,0,0,.12)}
-@media (prefers-reduced-motion:no-preference){.pg{transition:transform .5s ease}.sizer{transition:height .5s ease}}
 .chip{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:10px;padding:6px 6px 6px 14px;border-radius:20px;background:var(--ink);color:var(--paper);font-size:13px;z-index:3;white-space:nowrap}
 .chip button{height:30px;border-radius:15px;border:0;background:var(--paper);color:var(--ink);padding:0 12px;font-weight:500}
 .chip.show{display:flex}
@@ -78,11 +80,29 @@ button{cursor:pointer}
 .ck .tx{padding:6px 6px;font-size:12.5px;line-height:1.35;border-left:1px solid var(--line)}
 .ck .tx .ref{display:block;font-size:10.5px;color:var(--muted);margin-top:1px}
 .ck .tx .note{display:block;font-size:11px;margin-top:3px;color:var(--bad)}
+.ck .tx .dnote{display:block;font-size:11px;margin-top:3px;color:var(--bad);font-style:italic}
+.ck .tx .phs{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.ck .tx .phs img{width:52px;height:52px;object-fit:cover;border-radius:4px;border:1px solid var(--line)}
+#v-kusurlar{white-space:pre-line;font-family:var(--font-body);font-size:12px;color:var(--bad)}
+.sigimg{height:56px;max-width:100%;background:#fff;border-radius:4px}
+.sigwrap{border:1px dashed var(--line);border-radius:12px;background:#fff;touch-action:none}
+.sigwrap canvas{display:block;width:100%;height:170px;border-radius:12px}
+.meter{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
+.meter i{display:block;height:6px;width:0;background:var(--ok)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.thumbs .t{position:relative}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.thumbs button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:11px;border:0;background:var(--ink);color:var(--paper);font-size:12px;line-height:22px;padding:0}
+.photoBtn{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--chip);font-weight:500;cursor:pointer}
+.photoBtn input{display:none}
+.confirm{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:8px 10px;font-size:13px;margin-top:8px;line-height:1.4}
+.confirm .row{margin-top:8px}
 .ck .m{border-left:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--font-num);font-size:15px}
 .ck .m.x{color:var(--ok)}
 .ck .m.x.ud{color:var(--bad);background:var(--bad-bg)}
 .ck .m.x.dash,.ck .m.x.nu{color:var(--muted)}
-.act{background:var(--accent-bg) !important;box-shadow:inset 3px 0 0 var(--accent)}
+.act{background:var(--accent-bg) !important;box-shadow:inset 5px 0 0 var(--accent);outline:3px solid var(--accent);outline-offset:-3px;animation:actBlink 1s ease-in-out infinite}
+@keyframes actBlink{0%,100%{outline-color:var(--accent);opacity:1}50%{outline-color:transparent;opacity:.55}}
 .miss{background:var(--warn-bg) !important;box-shadow:inset 3px 0 0 var(--warn)}
 .res{padding:10px 8px;font-size:13px;font-weight:600}
 .res.ok{color:var(--ok)} .res.bad{color:var(--bad)}
@@ -141,8 +161,6 @@ button{cursor:pointer}
 <div class="app">
   <div class="top">
     <div class="ttl"><b>Buhar kazanı periyodik kontrol</b><span id="stat">Örnek Tekstil, Tuzla</span></div>
-    <button class="pill" id="zoomBtn" type="button" aria-label="Yakınlaştır veya uzaklaştır">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="6"/><path d="M15 15l5 5"/><path id="zplus" d="M10 7v6"/><path d="M7 10h6"/></svg><span id="zoomTxt">Genel</span></button>
     <button class="pill on" id="sndBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="sw1" d="M16 9a4 4 0 0 1 0 6"/><path id="sw2" d="M19 6a8 8 0 0 1 0 12"/></svg><span id="sndTxt">Sesli</span></button>
   </div>
   <div class="prog"><i id="progBar"></i></div>
@@ -208,11 +226,13 @@ const F = [
  {id:"c25", l:"Manometreler doğru ve kalibrasyonları geçerli", ref:"TS 2025", t:"yn"},
  {sec:"Notlar ve sonuç", kind:"kv"},
  {id:"notlar", l:"Notlar", t:"text", optional:true, q:"Eklemek istediğin bir not var mı?"},
+ {id:"kusurlar", l:"Tespit edilen uygunsuzluklar", t:"calc"},
  {id:"sonuc", l:"Sonuç", t:"calc"},
  {sec:"Kontrolü yapan", kind:"kv"},
  {id:"ad", l:"Adı soyadı", t:"text", v:"Örnek Mühendis", src:"profil"},
  {id:"meslek", l:"Mesleği", t:"text", v:"Makine mühendisi", src:"profil"},
- {id:"ekipnet", l:"EKİPNET kayıt no", t:"text", v:"K00000000", src:"profil"}
+ {id:"ekipnet", l:"EKİPNET kayıt no", t:"text", v:"K00000000", src:"profil"},
+ {id:"imza", l:"İmza", t:"sign", q:"İmzanı aşağıdaki alana at."}
 ];
 const YN = [["U","Uygun"],["UD","Uygun değil"],["-","Yok"],["NU","Uygulanmaz"]];
 const byId = {}; F.forEach(f=>{ if(f.id) byId[f.id]=f; });
@@ -221,6 +241,7 @@ const OUT = 0.46;
 
 /* ---------- Durum ---------- */
 let S = {vals:{}, src:{}, over:{}, bas:null, bit:null, tarih:null};
+let scrollGoal = null;
 let cur = null, scale = 1, manual = false, soundMode = "all", started = false, pendingTimer = null;
 const KEY = "pk-buhar-saha-v1";
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
@@ -263,6 +284,8 @@ function compute(){
     v.c22 = bad ? "UD" : "U"; S.src.c22 = "otomatik";
     if(bad) byId.c22.note = "Sınır "+trn(lim)+" bar. Ölçülen: "+trn(a)+(isEmpty("ventil2")?"":" ve "+trn(b))+" bar.";
   } else if(!S.over.c22){ v.c22 = null; }
+  const kl = F.filter(f=>f.t==="yn" && v[f.id]==="UD").map(f=>{ const d=S.defects[f.id]; return "Madde "+NUM[f.id]+": "+((d&&d.note)||f.note||f.l)+((d&&d.photos&&d.photos.length)?" ("+d.photos.length+" fotoğraf)":""); });
+  v.kusurlar = kl.length ? kl.join("\n") : (ORDER.filter(isEmpty).length ? "" : "Yok");
   const missing = ORDER.filter(isEmpty);
   if(missing.length) v.sonuc = "";
   else v.sonuc = ORDER.some(id=>v[id]==="UD") ? "UYGUN DEĞİL: belirtilen uygunsuzluklar giderilmeden kullanılması sakıncalıdır." : "UYGUNDUR: bir sonraki periyodik kontrole kadar belirtilen şartlarda kullanılabilir.";
@@ -280,6 +303,7 @@ function checkWarn(id, val){
 }
 
 /* ---------- Rapor çizimi ---------- */
+const NUM = {};
 function buildDoc(){
   let h = '<h1>Buhar kazanı periyodik kontrol raporu</h1><div class="sub">İş Ekipmanlarının Kullanımında Sağlık ve Güvenlik Şartları Yönetmeliği, EK-III</div>';
   let open = false, kind = "kv", n = 0;
@@ -296,8 +320,8 @@ function buildDoc(){
     } else if(kind==="kv"){
       h += '<div class="kv" data-id="'+f.id+'" id="r-'+f.id+'"><div class="k">'+esc(f.l)+'</div><div class="v" id="v-'+f.id+'"></div></div>';
     } else {
-      n++;
-      h += '<div class="ck" data-id="'+f.id+'" id="r-'+f.id+'"><div class="no">'+n+'</div><div class="tx">'+esc(f.l)+(f.ref?'<span class="ref">'+esc(f.ref)+'</span>':'')+'<span class="note" id="n-'+f.id+'"></span></div>'+
+      n++; NUM[f.id]=n;
+      h += '<div class="ck" data-id="'+f.id+'" id="r-'+f.id+'"><div class="no">'+n+'</div><div class="tx">'+esc(f.l)+(f.ref?'<span class="ref">'+esc(f.ref)+'</span>':'')+'<span class="note" id="n-'+f.id+'"></span><span class="dnote" id="d-'+f.id+'"></span><span class="phs" id="p-'+f.id+'"></span></div>'+
         YN.map(y=>'<div class="m" data-k="'+y[0]+'"></div>').join("")+'</div>';
     }
   });
@@ -318,6 +342,12 @@ function paint(){
         m.textContent = on ? "✓" : "";
       });
       $("n-"+f.id).textContent = f.note || "";
+      const d = S.defects[f.id]; const isUD = v==="UD";
+      $("d-"+f.id).textContent = (isUD && d && d.note) ? "Not: "+d.note : "";
+      const pe = $("p-"+f.id); const keys = (isUD && d && d.photos) ? d.photos : [];
+      if(pe.dataset.k !== keys.join(",")){ pe.dataset.k = keys.join(","); pe.innerHTML=""; keys.forEach(k=>photoSrc(k).then(src=>{ if(src){ const im=document.createElement("img"); im.src=src; im.alt="Uygunsuzluk fotoğrafı"; pe.appendChild(im); } })); }
+    } else if(f.t==="sign"){
+      const el = $("v-"+f.id); if(el) el.innerHTML = v ? '<img class="sigimg" alt="İmza" src="'+v+'">' : "";
     } else {
       const el = $("v-"+f.id); if(!el) return;
       let txt = (v===undefined||v===null||v==="") ? "" : (f.t==="num" ? trn(v)+(f.unit?" "+f.unit:"") : String(v));
@@ -342,16 +372,15 @@ function layout(){
   applyScale(scale, null, false);
 }
 function applyScale(s, rowId, smooth){
-  scale = s;
-  const W = vp.clientWidth, H = pg.offsetHeight;
-  pg.style.transform = "translateX("+(W*(1-s)/2)+"px) scale("+s+")";
-  sizer.style.height = (H*s)+"px";
-  $("zoomTxt").textContent = s<1 ? "Yakın" : "Genel";
+  scale = 1;
+  pg.style.transform = "none";
+  sizer.style.height = pg.offsetHeight+"px";
   if(rowId){
-    const r = $("r-"+rowId);
-    const top = (r.offsetTop + r.offsetHeight/2)*s - vp.clientHeight/2;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    vp.scrollTo({top:Math.max(0,top), behavior:(smooth&&!reduce)?"smooth":"auto"});
+    const target = ()=>{ const r = $("r-"+rowId); if(!r) return 0; return Math.max(0,(r.offsetTop + r.offsetHeight/2)*scale - vp.clientHeight/2); };
+    scrollGoal = rowId;
+    vp.scrollTo({top:target(), behavior:(smooth&&!reduce)?"smooth":"auto"});
+    setTimeout(()=>{ if(scrollGoal===rowId && !manual){ const t=target(); if(Math.abs(vp.scrollTop-t)>4) vp.scrollTo({top:t, behavior:"smooth"}); } }, 560);
   }
 }
 function setManual(on){
@@ -360,7 +389,6 @@ function setManual(on){
 }
 ["wheel","touchmove"].forEach(ev=>vp.addEventListener(ev, ()=>{ if(!manual) setManual(true); }, {passive:true}));
 $("resume").addEventListener("click", ()=>{ setManual(false); if(cur) ask(cur); });
-$("zoomBtn").addEventListener("click", ()=>{ setManual(true); applyScale(scale<1?1:OUT, cur, true); });
 window.addEventListener("resize", layout);
 
 /* ---------- Ses: soru okuma ve dinleme ---------- */
@@ -388,10 +416,14 @@ function voiceScore(v){ const n=v.name.toLowerCase(); let sc=0;
 function bestVoice(){ if(!VOICES.length) return null; if(voicePick){ const v=VOICES.find(x=>x.name===voicePick); if(v) return v; }
   return VOICES.slice().sort((a,b)=>voiceScore(b)-voiceScore(a))[0]; }
 function voiceRow(){ const el=$("voiceRow"); if(!el) return;
-  if(!VOICES.length){ el.textContent = "Okuyan ses: telefonun varsayılan sesi"; return; }
+  const extra = '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="sm" id="lOpen" style="height:30px;padding:0 12px;border-radius:15px;border:1px solid var(--line);background:transparent">Öğrenilen kelimeler ('+(Object.keys(S.learnG||{}).length+Object.keys(S.learnN||{}).length)+')</button>'+(micOK?'<button type="button" class="sm" id="boostBtn" style="height:30px;padding:0 12px;border-radius:15px;border:1px solid var(--line);background:transparent">Mikrofon: '+(BOOST?'güçlendirilmiş':'standart')+'</button>':'')+'</div>'+(BOOST&&micOK?'<div class="meter"><i id="lvl"></i></div>':'');
+  const wire = ()=>{ const lo=$("lOpen"); if(lo) lo.addEventListener("click", ()=>{ stopListen(); learnedPanel(()=>ask(cur)); });
+    const bb=$("boostBtn"); if(bb) bb.addEventListener("click", ()=>{ BOOST=!BOOST; try{ localStorage.setItem("pk-boost", BOOST?"1":""); }catch(e){} if(!BOOST) stopStream(); voiceRow(); if(cur) listen(true); }); };
+  if(!VOICES.length){ el.innerHTML = "Okuyan ses: telefonun varsayılan sesi"+extra; wire(); return; }
   const bv = bestVoice();
   el.innerHTML = 'Okuyan ses: <select id="voiceSel" style="max-width:62%;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--paper)">'+
     VOICES.map(v=>'<option'+(bv&&v.name===bv.name?' selected':'')+'>'+esc(v.name)+'</option>').join("")+'</select> <button type="button" class="sm" id="vTest" style="height:30px;padding:0 10px;border-radius:15px;border:1px solid var(--line);background:transparent">Dinle</button>';
+  el.insertAdjacentHTML("beforeend", extra); wire();
   $("voiceSel").addEventListener("change", e=>{ voicePick=e.target.value; try{ localStorage.setItem("pk-voice", voicePick); }catch(_){} });
   $("vTest").addEventListener("click", ()=>{ const m=soundMode; soundMode="all"; speak("Emniyet ventili kaç barda açtı?", false, null); soundMode=m; });
 }
@@ -444,28 +476,52 @@ else if(!window.isSecureContext){ micOK=false; micMsg="Bu adreste mikrofon açı
 else if(IN_FRAME){ micOK=false; micMsg="Claude önizlemesinde mikrofon kapalı. Sayfayı kendi https adresinden Chrome ile aç ya da aşağıdan yazarak dene."; }
 function setLis(state, txt){ const l = $("lis"); if(!l) return;
   if(state==="on"){ l.className="lis on"; l.innerHTML='<span class="dot"></span>Dinliyor...'; }
-  else if(state==="na"){ l.className="lis"; l.textContent= soundMode==="off" ? 'Ses kapalı' : 'Klavye mikrofonuyla konuş'; }
+  else if(state==="na"){ l.className="lis"; l.textContent= soundMode==="off" ? 'Ses kapalı' : 'Mikrofon kapalı'; }
   else if(soundMode==="all"){ l.className="lis"; l.textContent='Mikrofon beklemede'; }
   else { l.className="lis"; l.textContent='Ses kapalı'; }
   const m=$("micMsg"); if(m) m.textContent = txt!==undefined ? txt : (state==="na"?micMsg:"");
   const mb=$("micBtn"); if(mb){ mb.classList.toggle("on", state==="on"); mb.querySelector("span").textContent = state==="on" ? "Dinliyorum, konuş" : "Konuşmak için dokun"; }
 }
 function stopListen(){ listenFor=null; listening=false; if(rec){ try{ rec.onend=null; rec.onresult=null; rec.abort(); }catch(e){} rec=null; } setLis(micOK?"off":"na"); }
+/* ---------- Mikrofon: başlama sesi, güçlendirme ve seviye göstergesi ---------- */
+let ACTX = null, BOOST = false, MSTREAM = null, GAINTRACK = null, TRACK_OK = true, meterRAF = null;
+try{ BOOST = localStorage.getItem("pk-boost")==="1"; }catch(e){}
+function actx(){ try{ if(!ACTX) ACTX = new (window.AudioContext||window.webkitAudioContext)(); if(ACTX.state==="suspended") ACTX.resume(); }catch(e){} return ACTX; }
+function beep(){ if(soundMode==="off") return; const c=actx(); if(!c) return; try{ const o=c.createOscillator(), g=c.createGain(); o.frequency.value=880; g.gain.value=0.06; o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+0.08); }catch(e){} }
+async function ensureStream(){
+  if(GAINTRACK && GAINTRACK.readyState==="live") return GAINTRACK;
+  const c = actx(); if(!c || !navigator.mediaDevices) return null;
+  MSTREAM = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true}});
+  const src = c.createMediaStreamSource(MSTREAM), g = c.createGain(), an = c.createAnalyser(), dst = c.createMediaStreamDestination();
+  g.gain.value = 2.5; an.fftSize = 512; src.connect(g); g.connect(an); g.connect(dst);
+  GAINTRACK = dst.stream.getAudioTracks()[0];
+  const buf = new Uint8Array(an.fftSize);
+  const tick = ()=>{ an.getByteTimeDomainData(buf); let m=0; for(const v of buf){ const d=Math.abs(v-128); if(d>m) m=d; } const l=$("lvl"); if(l) l.style.width=Math.min(100, m/128*160)+"%"; meterRAF = requestAnimationFrame(tick); };
+  cancelAnimationFrame(meterRAF); tick();
+  return GAINTRACK;
+}
+function stopStream(){ cancelAnimationFrame(meterRAF); try{ if(MSTREAM) MSTREAM.getTracks().forEach(t=>t.stop()); }catch(e){} MSTREAM=null; GAINTRACK=null; }
 function listen(fromTap){
   if(!started || !cur) return;
+  if(byId[cur] && byId[cur].t==="sign" && !defectFor) return;
   if(!fromTap && soundMode!=="all") return;
   if(!micOK){ setLis("na"); return; }
   if(rec){ try{ rec.onend=null; rec.abort(); }catch(e){} rec=null; }
   const forId = cur; listenFor = forId;
   try{
-    rec = new SR(); rec.lang = "tr-TR"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 5;
+    rec = new SR(); rec.lang = "tr-TR"; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 5;
     if(LOCAL==="available"){ try{ rec.processLocally = true; }catch(e){} }
     if(PHRASE_OK && LOCAL==="available"){ try{ rec.phrases = phraseList(byId[forId]); }catch(e){ PHRASE_OK=false; } }
     rec.onresult = e=>{
-      const r = e.results[e.results.length-1];
-      if(!r.isFinal){ const h=$("heard"); if(h){ h.style.color="var(--muted)"; h.textContent='Duyuluyor: "'+r[0].transcript+'"'; } return; }
-      listenFor = null;
-      handleSpeech(Array.from(r).map(a=>a.transcript));
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const r = e.results[i];
+        if(!r.isFinal){ const h=$("heard"); if(h){ h.style.color="var(--muted)"; h.textContent='Duyuluyor: "'+r[0].transcript+'"'; } continue; }
+        const alts = Array.from(r).map(a=>a.transcript).filter(t=>t && t.trim());
+        if(!alts.length) continue;
+        listenFor = null;
+        try{ rec.onend=null; rec.stop(); }catch(_){} rec=null; listening=false;
+        handleSpeech(alts); return;
+      }
     };
     rec.onerror = e=>{
       const map = {"not-allowed":"Mikrofon izni verilmedi. Adres çubuğundaki kilit simgesinden mikrofona izin ver.",
@@ -475,13 +531,20 @@ function listen(fromTap){
         "language-not-supported":"Bu cihazda Türkçe ses tanıma yok."};
       if(e.error==="phrases-not-supported"){ PHRASE_OK=false; listenFor=null; setTimeout(()=>listen(), 200); return; }
       if(e.error==="language-not-supported" && LOCAL==="available"){ LOCAL="unavailable"; engineNote(); listenFor=null; setTimeout(()=>listen(), 200); return; }
+      if(usingTrack && (e.error==="audio-capture"||e.error==="aborted")){ TRACK_OK=false; stopStream(); listenFor=null; setTimeout(()=>listen(true), 250); return; }
       if(map[e.error]){ if(e.error!=="network"){ micOK=false; micMsg=map[e.error]; } listenFor=null; setLis("na", map[e.error]); }
     };
     rec.onend = ()=>{ rec=null; listening=false;
       if(listenFor===forId && cur===forId && micOK && soundMode==="all"){ setTimeout(()=>{ if(listenFor===forId && cur===forId) listen(); }, 250); }
       else if(micOK) setLis("off");
     };
-    rec.start(); listening=true; setLis("on");
+    let usingTrack = false;
+    const go = async ()=>{
+      if(BOOST && TRACK_OK){ try{ const t = await ensureStream(); if(t && listenFor===forId){ rec.start(t); usingTrack = true; } }catch(e){ TRACK_OK=false; stopStream(); } }
+      if(!usingTrack){ if(listenFor!==forId) return; rec.start(); }
+      listening=true; setLis("on"); beep();
+    };
+    go().catch(e=>setLis("na", "Mikrofon başlatılamadı: "+e.message));
   }catch(e){ setLis("na", "Mikrofon başlatılamadı: "+e.message); }
 }
 /* ---------- Konuşmayı anlama: kurallarla, yapay zekâsız ---------- */
@@ -538,7 +601,39 @@ S.learn = S.learn || {}; S.learnG = S.learnG || {};
 function norm(t){ return String(t).toLocaleLowerCase("tr").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim(); }
 function findLearned(map, n){ if(!map) return null; const keys = Object.keys(map).sort((x,y)=>y.length-x.length);
   for(const k of keys){ if(n===k || (" "+n+" ").includes(" "+k+" ")) return map[k]; } return null; }
-function learnedYN(qid, t){ const n=norm(t); const a=findLearned(S.learn[qid], n); if(a) return a; return findLearned(S.learnG, n); }
+/* ---------- Ortak havuz: telefonların öğrendikleri sunucuda toplanır, yeterince telefon aynı şeyi öğrenince herkese dağıtılır ---------- */
+const SYNC = { url: "", key: "" };   // Supabase proje adresi ve "anon public" anahtarı buraya yazılır
+let POOL = {yn:{}, sayi:{}}, lastSync = null;
+try{ const p = JSON.parse(localStorage.getItem("pk-pool")); if(p) { POOL = {yn:p.yn||{}, sayi:p.sayi||{}}; lastSync = p.t||null; } }catch(e){}
+let DEV = null; try{ DEV = localStorage.getItem("pk-dev"); if(!DEV){ DEV = (crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c=>(c ^ Math.random()*16 >> c/4).toString(16))); localStorage.setItem("pk-dev", DEV); } }catch(e){}
+S.learnN = S.learnN || {}; S.outbox = S.outbox || {}; S.sent = S.sent || {};
+function queueVote(tur, duyulan, deger){ S.outbox[tur+"|"+duyulan] = {tur, duyulan, deger: deger==null ? "" : String(deger)}; save(); scheduleSync(); }
+let syncing = false;
+async function syncNow(){
+  if(!SYNC.url || !SYNC.key || syncing || !navigator.onLine) return false;
+  syncing = true;
+  const h = {apikey:SYNC.key, Authorization:"Bearer "+SYNC.key, "Content-Type":"application/json"};
+  try{
+    const items = Object.values(S.outbox);
+    if(items.length){
+      const r = await fetch(SYNC.url+"/rest/v1/rpc/oy_ver", {method:"POST", headers:h, body:JSON.stringify({p_cihaz:DEV, p_oylar:items})});
+      if(!r.ok) throw new Error("oy");
+      for(const it of items){ const k = it.tur+"|"+it.duyulan; if(S.outbox[k]===it){ delete S.outbox[k]; if(it.deger) S.sent[k]=it.deger; else delete S.sent[k]; } }
+      save();
+    }
+    const r2 = await fetch(SYNC.url+"/rest/v1/rpc/onayli_sozluk", {method:"POST", headers:h, body:"{}"});
+    if(r2.ok){ const j = await r2.json() || {}; POOL = {yn:j.yn||{}, sayi:j.sayi||{}}; lastSync = Date.now(); try{ localStorage.setItem("pk-pool", JSON.stringify({...POOL, t:lastSync})); }catch(e){} }
+    syncing = false; return true;
+  }catch(e){ syncing = false; return false; }
+}
+let syncT = null; function scheduleSync(){ clearTimeout(syncT); syncT = setTimeout(syncNow, 1500); }
+window.addEventListener("online", scheduleSync);
+setInterval(()=>{ if(!document.hidden) syncNow(); }, 5*60*1000);
+scheduleSync();
+function learnedNum(t){ const n = norm(t); const v = (n in S.learnN) ? S.learnN[n] : (n in POOL.sayi ? POOL.sayi[n] : null); if(v===null || v===undefined) return null; const x = parseFloat(v); return isNaN(x) ? null : x; }
+let BASE_YN = {};
+BASE_YN = {"temiz": "U", "sağlam": "U", "çalışıyor": "U", "mevcut": "U", "işaretli": "U", "düzgün": "U", "sorunsuz": "U", "kirli": "UD", "bozuk": "UD", "kırık": "UD", "arızalı": "UD", "çalışmıyor": "UD", "sızdırıyor": "UD", "eksik": "UD", "kapsam dışı": "NU"}; Object.assign(FIX, {"bumbar": "on bar", "onbar": "on bar", "ombar": "on bar"});
+function learnedYN(qid, t){ const n=norm(t); const a=findLearned(S.learn[qid], n); if(a) return a; const b=findLearned(S.learnG, n); if(b) return b; const c=findLearned(POOL.yn, n); if(c) return c; return findLearned(BASE_YN, n); }
 function naturalYN(t){ const n=" "+norm(t)+" ";
   if(/ kirli | bozuk | kırık | çatlak | arızalı | çalışmıyor | sızdırıyor | sızıntı var | paslı | eksik | hasarlı | okunmuyor | görünmüyor /.test(n)) return "UD";
   if(/ temiz | sağlam | çalışıyor | mevcut | işaretli | düzgün | normal | sorunsuz | iyi | geçerli | yerinde /.test(n)) return "U";
@@ -546,10 +641,36 @@ function naturalYN(t){ const n=" "+norm(t)+" ";
 function learnFrom(val){
   if(!lastHeard || lastHeard.q!==cur || byId[cur].t!=="yn" || lastHeard.parsed===val) return "";
   const n = norm(lastHeard.text); if(!n || n.length>40) return "";
-  (S.learn[cur] = S.learn[cur] || {})[n] = val; S.learnG[n] = val; save();
+  (S.learn[cur] = S.learn[cur] || {})[n] = val; S.learnG[n] = val; save(); queueVote("yn", n, val);
   return 'Öğrendim: "'+lastHeard.text+'" artık '+YN.find(y=>y[0]===val)[1]+' sayılacak.';
 }
+function learnedPanel(back){
+  const sb = 'height:28px;padding:0 10px;border-radius:14px;border:1px solid var(--line);background:transparent';
+  const rows = [];
+  for(const k of Object.keys(S.learnG||{})) rows.push({tur:"yn", k, v:S.learnG[k], label:(YN.find(y=>y[0]===S.learnG[k])||["",""])[1]});
+  for(const k of Object.keys(S.learnN||{})) rows.push({tur:"sayi", k, v:String(S.learnN[k]), label:trn(S.learnN[k])});
+  const durum = r=>{ const key=r.tur+"|"+r.k; const pv = (POOL[r.tur]||{})[r.k];
+    if(pv!==undefined && String(pv)===r.v) return '<span style="color:var(--ok)">herkeste geçerli</span>';
+    if(S.outbox[key]) return 'internet bekleniyor';
+    if(S.sent[key]) return 'oylamada';
+    return ''; };
+  const poolN = Object.keys(POOL.yn).length + Object.keys(POOL.sayi).length;
+  let h = '<div class="qtx">Öğrenilen kelimeler</div><div class="hint">Bu telefonun öğrendikleri internet olunca kendiliğinden ortak havuza gider. Aynı kelimeyi 10 farklı telefon aynı şekilde öğrenince herkesin telefonunda geçerli olur.</div>';
+  h += '<p class="small">Ortak havuzda kabul edilmiş: <b>'+poolN+'</b> kelime'+(lastSync?' · son eşitleme '+new Date(lastSync).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):'')+(SYNC.url?'':' · <span style="color:var(--bad)">sunucu adresi henüz girilmedi</span>')+'</p>';
+  h += rows.length ? '<div class="tbl" style="margin-bottom:10px">'+rows.map(r=>'<div class="kv ro"><div class="k">"'+esc(r.k)+'"</div><div class="v" style="display:flex;justify-content:space-between;align-items:center;gap:6px"><span>'+esc(r.label)+'<br><span class="small">'+durum(r)+'</span></span><button type="button" class="sm lw" data-t="'+r.tur+'" data-k="'+esc(r.k)+'" style="'+sb+'">Sil</button></div></div>').join("")+'</div>' : '<p class="small">Bu telefonda henüz öğrenilen kelime yok.</p>';
+  h += '<div class="row"><button type="button" class="btn" id="lSync" style="flex:1">Şimdi eşitle</button><button type="button" class="btn ghost" id="lBack" style="flex:1">Geri</button></div><div class="small" id="lMsg" style="margin-top:6px"></div>';
+  $("panel").innerHTML = h;
+  document.querySelectorAll(".lw").forEach(b=>b.addEventListener("click", ()=>{ const k=b.dataset.k, t=b.dataset.t;
+    if(t==="yn"){ delete S.learnG[k]; Object.values(S.learn).forEach(m=>{ if(m) delete m[k]; }); } else delete S.learnN[k];
+    save(); queueVote(t, k, null); learnedPanel(back); }));
+  $("lSync").addEventListener("click", async ()=>{ const m=$("lMsg");
+    if(!SYNC.url){ m.textContent="Sunucu adresi girilmediği için eşitlenemiyor."; return; }
+    if(!navigator.onLine){ m.textContent="İnternet yok. Bağlanınca kendiliğinden gönderilecek."; return; }
+    m.textContent="Eşitleniyor..."; const ok = await syncNow(); if(ok) learnedPanel(back); else m.textContent="Sunucuya ulaşılamadı. Sonra tekrar denenecek."; });
+  $("lBack").addEventListener("click", back);
+}
 function handleSpeech(alts){
+  if(defectFor){ defectSpeech(alts); return; }
   const f = byId[cur]; if(!f) return;
   lastHeard = {q:cur, text:alts[0], parsed:null};
   for(const a of alts){
@@ -559,13 +680,17 @@ function handleSpeech(alts){
     if(c==="repeat"){ renderPanel(); speakQ(); return; }
     let val = null;
     if(f.t==="yn") val = learnedYN(cur, a) || naturalYN(a) || parseYN(a);
-    else if(f.t==="num") val = parseNum(a);
+    else if(f.t==="num"){ val = learnedNum(a); if(val===null) val = parseNum(a); }
     else if(f.t==="choice") val = f.opts.find(o=>a.toLocaleLowerCase("tr").includes(o.toLocaleLowerCase("tr"))) || null;
     else if(f.t==="text") val = a.trim();
     if(val!==null && val!==""){
       lastHeard = {q:cur, text:a, parsed:val};
       showHeard(a, val);
-      if(f.t==="num"){ const i=$("inp"); if(i) i.value = trn(val); }
+      if(f.t==="num"){ const i=$("inp"); if(i) i.value = trn(val);
+        if(!plausible(cur, val)){ clearTimeout(pendingTimer); stopListen(); const h=$("heard");
+          if(h){ h.style.color=""; h.innerHTML='<div class="confirm">"'+esc(a)+'" duyuldu: <b>'+trn(val)+(f.unit?" "+esc(f.unit):"")+'</b>. Bu değer beklenenden çok farklı, emin misin?<div class="row"><button type="button" class="btn" id="cfYes" style="flex:1">Evet, kaydet</button><button type="button" class="btn ghost" id="cfNo" style="flex:1">Düzelt</button></div></div>';
+            $("cfYes").addEventListener("click", ()=>commit(cur, val)); $("cfNo").addEventListener("click", ()=>{ const i=$("inp"); if(i){ i.focus(); i.select(); } }); }
+          speak("Bu değer beklenenden farklı, emin misin?", true, ()=>{}); return; } }
       if(f.t==="yn"||f.t==="choice"){ document.querySelectorAll(".ans").forEach(b=>b.classList.toggle("sel", b.dataset.v===val)); }
       clearTimeout(pendingTimer);
       const wait = f.t==="num" ? 2200 : 1000;
@@ -580,6 +705,90 @@ function handleSpeech(alts){
 function showHeard(a, val){ const h=$("heard"); if(!h) return; h.style.color=""; const f=byId[cur];
   const shown = f.t==="yn" ? YN.find(y=>y[0]===val)[1] : f.t==="num" ? trn(val)+(f.unit?" "+f.unit:"") : val;
   h.textContent = 'Duyulan: "'+a+'" → '+shown; }
+
+/* ---------- Fotoğraflar: telefonda saklanır (IndexedDB) ---------- */
+const PH = {};
+function idb(){ return new Promise((res,rej)=>{ try{ const r=indexedDB.open("pk-photos",1); r.onupgradeneeded=()=>r.result.createObjectStore("p"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }catch(e){ rej(e); } }); }
+async function photoPut(k,v){ PH[k]=v; try{ const db=await idb(); db.transaction("p","readwrite").objectStore("p").put(v,k); }catch(e){} }
+async function photoSrc(k){ if(PH[k]) return PH[k]; try{ const db=await idb(); return await new Promise(r=>{ const q=db.transaction("p").objectStore("p").get(k); q.onsuccess=()=>{ PH[k]=q.result; r(q.result); }; q.onerror=()=>r(null); }); }catch(e){ return null; } }
+async function photoDel(k){ delete PH[k]; try{ const db=await idb(); db.transaction("p","readwrite").objectStore("p").delete(k); }catch(e){} }
+async function photoClear(){ for(const k in PH) delete PH[k]; try{ const db=await idb(); db.transaction("p","readwrite").objectStore("p").clear(); }catch(e){} }
+function shrink(file){ return new Promise(res=>{ const img=new Image(); const u=URL.createObjectURL(file);
+  img.onload=()=>{ const m=1280, sc=Math.min(1, m/Math.max(img.width,img.height)); const c=document.createElement("canvas"); c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc); c.getContext("2d").drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(u); res(c.toDataURL("image/jpeg",0.72)); };
+  img.onerror=()=>{ URL.revokeObjectURL(u); res(null); }; img.src=u; }); }
+function buzz(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+
+/* ---------- Şüpheli sayı kontrolü ---------- */
+function plausible(id, x){
+  const isl = Number(S.vals.isletme), yr = new Date().getFullYear();
+  if((id==="ventil1"||id==="ventil2") && isl) return x >= isl*0.5 && x <= isl*1.6;
+  if(id==="yil") return x>=1950 && x<=yr;
+  if(id==="isletme"||id==="tasarim") return x>0.3 && x<=60;
+  if(id==="ventilSay"||id==="suSeviye") return x>=0 && x<=6 && Number.isInteger(x);
+  if(id==="kapasite") return x>=50 && x<=100000;
+  return true;
+}
+let typedConfirm = null;
+
+/* ---------- Uygunsuzluk notu ve fotoğraf ---------- */
+let defectFor = null, defectDone = null, defectTimer = null;
+function defectPanel(id, done){
+  defectFor = id; defectDone = done;
+  const d = S.defects[id] = S.defects[id] || {note:"", photos:[]};
+  let h = '<div class="qno"><span>Madde '+NUM[id]+' uygun değil</span><span id="lis" class="lis"></span></div>';
+  h += '<div class="qtx">Uygunsuzluğu kısaca anlat</div><div class="hint">Örnek: "manometrede kırmızı çizgi yok". Rapora not olarak yazılır.</div>';
+  h += '<div class="row"><input class="inp txt" id="dnote" autocomplete="off" value="'+esc(d.note||"")+'" placeholder="Açıklama"></div>';
+  h += '<div class="heard" id="heard"></div>';
+  h += '<div class="grid2" style="margin-top:10px"><label class="photoBtn"><input type="file" id="dfile" accept="image/*" capture="environment">Fotoğraf çek</label><button type="button" class="btn" id="dsave">Kaydet ve devam</button></div>';
+  h += '<div class="thumbs" id="thumbs"></div>';
+  h += '<button type="button" class="mic" id="micBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Konuşmak için dokun</span></button><div class="small" id="micMsg"></div>';
+  if(!micOK) h = h.replace(/<button type="button" class="mic"[\s\S]*?<\/button><div class="small" id="micMsg"><\/div>/, "");
+  h += '<div class="nav"><span></span><button type="button" class="sm" id="dskip">Açıklamasız geç</button></div>';
+  $("panel").innerHTML = h;
+  setLis(micOK ? "off" : "na");
+  drawThumbs();
+  if($("micBtn")) $("micBtn").addEventListener("click", ()=>{ try{ speechSynthesis.cancel(); }catch(e){} if(listening){ stopListen(); } else { listen(true); } });
+  $("dnote").addEventListener("input", ()=>clearTimeout(defectTimer));
+  $("dfile").addEventListener("change", async e=>{ clearTimeout(defectTimer); for(const f of Array.from(e.target.files||[])){ const src=await shrink(f); if(src){ const k=id+"-"+Date.now(); await photoPut(k,src); d.photos.push(k); } } e.target.value=""; save(); drawThumbs(); buzz(30); });
+  $("dsave").addEventListener("click", defectFinish);
+  $("dskip").addEventListener("click", ()=>{ $("dnote").value = $("dnote").value; defectFinish(); });
+  speak("Uygunsuzluğu kısaca anlat.", false, ()=>listen());
+}
+function drawThumbs(){ const t=$("thumbs"); if(!t||!defectFor) return; const d=S.defects[defectFor]; t.innerHTML="";
+  d.photos.forEach(k=>photoSrc(k).then(src=>{ if(!src) return; const w=document.createElement("div"); w.className="t"; w.innerHTML='<img alt="Fotoğraf" src="'+src+'"><button type="button" aria-label="Fotoğrafı sil">×</button>';
+    w.querySelector("button").addEventListener("click", ()=>{ d.photos=d.photos.filter(x=>x!==k); photoDel(k); save(); drawThumbs(); }); t.appendChild(w); })); }
+function defectSpeech(alts){
+  const a = alts[0]||""; const n = norm(a);
+  if(/^(geç|atla|yok|açıklama yok|devam|tamam|kaydet)$/.test(n)){ defectFinish(); return; }
+  const i=$("dnote"); if(!i) return;
+  i.value = i.value ? i.value+" "+a : a;
+  const h=$("heard"); if(h){ h.style.color=""; h.textContent='Eklendi. Devam etmek için "tamam" de ya da Kaydet\'e bas.'; }
+  clearTimeout(defectTimer); defectTimer = setTimeout(defectFinish, 4000);
+  setTimeout(()=>listen(), 300);
+}
+function defectFinish(){
+  clearTimeout(defectTimer); stopListen();
+  const id = defectFor; if(!id) return;
+  const i=$("dnote"); S.defects[id].note = i ? i.value.trim() : S.defects[id].note;
+  defectFor = null; const done = defectDone; defectDone = null;
+  paint(); buzz(35); if(done) done();
+}
+
+/* ---------- İmza ---------- */
+function signPanelInit(){
+  const c=$("sig"); if(!c) return; const r=c.getBoundingClientRect(); const dpr=window.devicePixelRatio||1;
+  c.width=Math.round(r.width*dpr); c.height=Math.round(r.height*dpr);
+  const g=c.getContext("2d"); g.scale(dpr,dpr); g.lineWidth=2.4; g.lineCap="round"; g.lineJoin="round"; g.strokeStyle="#111";
+  let draw=false, drawn=false, last=null;
+  const pt=e=>{ const b=c.getBoundingClientRect(); return {x:e.clientX-b.left, y:e.clientY-b.top}; };
+  c.addEventListener("pointerdown", e=>{ draw=true; last=pt(e); c.setPointerCapture(e.pointerId); });
+  c.addEventListener("pointermove", e=>{ if(!draw) return; const p=pt(e); g.beginPath(); g.moveTo(last.x,last.y); g.lineTo(p.x,p.y); g.stroke(); last=p; drawn=true; });
+  ["pointerup","pointercancel","pointerleave"].forEach(ev=>c.addEventListener(ev, ()=>{ draw=false; }));
+  $("sigClear").addEventListener("click", ()=>{ g.clearRect(0,0,c.width,c.height); drawn=false; });
+  $("sigSave").addEventListener("click", ()=>{ if(!drawn){ $("err").textContent="Önce imzanı at"; return; }
+    const o=document.createElement("canvas"); o.width=480; o.height=Math.round(480*c.height/c.width); const og=o.getContext("2d"); og.fillStyle="#fff"; og.fillRect(0,0,o.width,o.height); og.drawImage(c,0,0,o.width,o.height);
+    commit(cur, o.toDataURL("image/png")); });
+}
 
 /* ---------- Soru akışı ---------- */
 function qText(f){ return f.q || (f.t==="yn" ? f.l+"?" : f.l+" nedir?"); }
@@ -598,6 +807,8 @@ function renderPanel(){
     h += '<div class="grid2">'+f.opts.map(o=>'<button type="button" class="ans'+(v===o?" sel":"")+'" data-v="'+esc(o)+'">'+esc(o)+'</button>').join("")+'</div>';
   } else if(f.t==="num"){
     h += '<div class="row"><input class="inp" id="inp" inputmode="decimal" autocomplete="off" placeholder="0" value="'+(v===undefined||v===null||v===""?"":trn(v))+'">'+(f.unit?'<span class="unit">'+esc(f.unit)+'</span>':'')+'<button type="button" class="btn" id="ok">Kaydet</button></div><div class="err" id="err"></div><div id="wr"></div>';
+  } else if(f.t==="sign"){
+    h += '<div class="sigwrap"><canvas id="sig" aria-label="İmza alanı"></canvas></div><div class="row" style="margin-top:8px"><button type="button" class="btn ghost" id="sigClear" style="flex:1">Temizle</button><button type="button" class="btn" id="sigSave" style="flex:1">İmzayı kaydet</button></div><div class="err" id="err"></div>';
   } else {
     h += '<div class="row"><input class="inp txt" id="inp" autocomplete="off" value="'+esc(v||"")+'"><button type="button" class="btn" id="ok">Kaydet</button></div><div class="err" id="err"></div>';
   }
@@ -618,6 +829,7 @@ function renderPanel(){
   if($("inp")){ $("inp").addEventListener("keydown", e=>{ if(e.key==="Enter") submitInput(); }); $("inp").addEventListener("input", ()=>{ $("err").textContent=""; liveWarn(); }); liveWarn(); }
   $("prev").addEventListener("click", goPrev);
   $("skip").addEventListener("click", goNext);
+  if(f.t==="sign") requestAnimationFrame(signPanelInit);
   voiceRow();
 }
 function liveWarn(){ const w=$("wr"); if(!w) return; const x=parseNum($("inp").value||""); const m = x===null?"":checkWarn(cur,x); w.innerHTML = m ? '<div class="warn">'+esc(m)+'</div>' : ""; }
@@ -626,6 +838,10 @@ function submitInput(){
   if(f.t==="num"){
     const x = parseNum(raw);
     if(raw==="" || x===null || isNaN(x)){ $("err").textContent = "Bir sayı gir, örneğin 11,5"; return; }
+    if(!plausible(cur, x) && typedConfirm!==cur+":"+x){ typedConfirm = cur+":"+x; $("err").textContent = "Bu değer beklenenden çok farklı. Doğruysa tekrar Kaydet'e bas."; buzz([60,40,60]); return; }
+    typedConfirm = null;
+    if(lastHeard && lastHeard.q===cur && lastHeard.parsed===null){ const n = norm(lastHeard.text);
+      if(n && n.length<=40 && !/^[\d.,\s]+$/.test(n)){ S.learnN[n] = x; save(); queueVote("sayi", n, x); } }
     commit(cur, x);
   } else {
     if(raw==="" && !f.optional){ $("err").textContent = "Bu alan boş bırakılamaz"; return; }
@@ -638,21 +854,23 @@ function commit(id, val){
   S.vals[id] = val; S.src[id] = "kullanıcı";
   const w = checkWarn(id, val);
   paint();
-  const after = ()=>{ $("r-"+id).classList.remove("act","miss"); applyScale(OUT, id, true);
-    $("panel").innerHTML = '<p class="msg small">Kaydedildi. Formun tamamına bakılıyor...</p>';
-    setTimeout(()=>goNextFrom(id), 750); };
-  if(w){ $("panel").insertAdjacentHTML("beforeend", '<div class="warn">'+esc(w)+'</div>'); speak(w, true, ()=>setTimeout(after, 300)); }
-  else after();
+  buzz(w ? [90,60,90] : 35);
+  const after = ()=>{ $("r-"+id).classList.remove("act","miss");
+    $("panel").innerHTML = '<p class="msg small">Kaydedildi.</p>';
+    setTimeout(()=>goNextFrom(id), 350); };
+  const next = (byId[id].t==="yn" && val==="UD") ? ()=>defectPanel(id, after) : after;
+  if(w){ $("panel").insertAdjacentHTML("beforeend", '<div class="warn">'+esc(w)+'</div>'); speak(w, true, ()=>setTimeout(next, 300)); }
+  else next();
 }
 function ask(id){
   if(!started) return;
-  lastHeard = null;
+  lastHeard = null; defectFor = null; defectDone = null; clearTimeout(defectTimer);
   clearTimeout(pendingTimer);
   if(cur){ const p=$("r-"+cur); if(p) p.classList.remove("act"); }
   cur = id; setManual(false);
   const r = $("r-"+id); r.classList.remove("miss"); r.classList.add("act");
-  applyScale(1, id, true);
   renderPanel();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>applyScale(1, id, true)));
   if(soundMode==="all") speakQ();
 }
 function goNextFrom(id){
@@ -662,7 +880,7 @@ function goNextFrom(id){
   if(after) return ask(after);
   finish();
 }
-function goNext(){ stopListen(); const id=cur; $("r-"+id).classList.remove("act"); applyScale(OUT, id, true); setTimeout(()=>goNextFrom(id), 600); }
+function goNext(){ stopListen(); const id=cur; $("r-"+id).classList.remove("act"); setTimeout(()=>goNextFrom(id), 150); }
 function goPrev(){ stopListen(); const i = ORDER.indexOf(cur); if(i>0) ask(ORDER[i-1]); }
 function renderIdle(){ $("panel").innerHTML = '<p class="msg">Serbest gezinme açık.</p><p class="small">Değiştirmek istediğin satıra dokun ya da üstteki "Kaldığım yerden devam" düğmesine bas.</p>'; }
 function finish(){
@@ -680,7 +898,8 @@ function finish(){
   paint();
   applyScale(OUT, "sonuc", true);
   const bad = ORDER.some(id=>S.vals[id]==="UD");
-  $("panel").innerHTML = '<p class="msg ok">Tamamlandı, eksik madde yok.</p><p class="small">Sonuç: '+(bad?"uygun değil, uygunsuzluklar raporda işaretli.":"uygun.")+' Herhangi bir satıra dokunarak hâlâ düzeltebilirsin.</p>'+
+  const kus = S.vals.kusurlar && S.vals.kusurlar!=="Yok" ? '<div class="warn" style="white-space:pre-line">'+esc(S.vals.kusurlar)+'</div>' : "";
+  $("panel").innerHTML = '<p class="msg ok">Tamamlandı, eksik madde yok.</p><p class="small">Sonuç: '+(bad?"uygun değil.":"uygun.")+' Herhangi bir satıra dokunarak hâlâ düzeltebilirsin.</p>'+kus+
     '<div class="row" style="margin-top:10px"><button type="button" class="btn" id="pdf" style="flex:1">PDF oluştur</button><button type="button" class="btn ghost" id="reset">Sıfırla</button></div><div class="small" id="pdfmsg" style="margin-top:8px"></div>';
   speak("Form tamamlandı.", true, ()=>{});
   $("pdf").addEventListener("click", ()=>{
@@ -690,7 +909,7 @@ function finish(){
   });
   $("reset").addEventListener("click", resetAll);
 }
-function resetAll(){ try{ localStorage.removeItem(KEY); }catch(e){} S={vals:{},src:{},over:{},bas:null,bit:null,tarih:null}; initVals(); started=false; cur=null; document.querySelectorAll(".act,.miss").forEach(r=>r.classList.remove("act","miss")); paint(); applyScale(OUT,null,false); vp.scrollTo({top:0}); startScreen(); }
+function resetAll(){ try{ localStorage.removeItem(KEY); }catch(e){} const keep={learn:S.learn||{}, learnG:S.learnG||{}, learnN:S.learnN||{}, outbox:S.outbox||{}, sent:S.sent||{}}; S={vals:{},src:{},over:{},bas:null,bit:null,tarih:null,defects:{},...keep}; save(); photoClear(); initVals(); started=false; cur=null; document.querySelectorAll(".act,.miss").forEach(r=>r.classList.remove("act","miss")); paint(); applyScale(OUT,null,false); vp.scrollTo({top:0}); startScreen(); }
 
 /* ---------- Satıra dokunarak düzeltme ---------- */
 $("doc").addEventListener("click", e=>{
@@ -705,14 +924,25 @@ function startScreen(){
   $("panel").innerHTML = '<p class="msg">Geçen yılın kazan bilgileri hazır. '+left+' madde sorulacak.</p><p class="small">Sorular sesli okunur, cevabı söyleyebilir ya da dokunabilirsin. Formda istediğin satıra dokunup oradan da başlayabilirsin.</p><div class="row" style="margin-top:10px"><button type="button" class="btn" id="go" style="flex:1">Kontrole başla</button></div>';
   $("go").addEventListener("click", ()=>begin(null));
 }
+/* ---------- Ekranı açık tutma ve geri dönünce kaldığı yerden devam ---------- */
+let wakeLock = null;
+async function keepAwake(){ try{ if("wakeLock" in navigator && document.visibilityState==="visible"){ wakeLock = await navigator.wakeLock.request("screen"); } }catch(e){} }
+document.addEventListener("visibilitychange", ()=>{
+  if(document.visibilityState==="hidden"){ if(rec){ try{ rec.onend=null; rec.abort(); }catch(e){} rec=null; listening=false; } try{ speechSynthesis.cancel(); }catch(e){} return; }
+  if(!started) return;
+  keepAwake();
+  if(cur){ renderPanel(); const h=$("heard"); if(h){ h.style.color="var(--muted)"; h.textContent="Kaldığın yerden devam ediyoruz."; }
+    if(soundMode==="all") setTimeout(speakQ, 400); }
+});
 function begin(id){
-  started = true; if(micOK) checkLocal();
+  started = true; actx(); keepAwake(); if(micOK) checkLocal();
   if(!S.bas) S.bas = new Date().toISOString();
   paint();
   const first = id || ORDER.find(isEmpty);
   if(first) ask(first); else finish();
 }
-load(); S.learn = S.learn || {}; S.learnG = S.learnG || {}; initVals(); buildDoc(); paint(); layout();
+if("serviceWorker" in navigator && location.protocol==="https:" && !IN_FRAME){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+load(); S.learn = S.learn || {}; S.learnG = S.learnG || {}; S.defects = S.defects || {}; initVals(); buildDoc(); paint(); layout();
 requestAnimationFrame(()=>{ applyScale(OUT, null, false); });
 startScreen();
 </script>
